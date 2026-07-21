@@ -42,8 +42,12 @@ app.get('/title/:title', (req, res) => {
 });
 
 // GET review by ISBN
-app.get('/review/:isbn', (req, res) => {
-    res.json({ reviews: reviews[req.params.isbn] || [] });
+app.get('/', (req, res) => {
+  const booksWithReviews = books.map(book => ({
+    ...book,
+    reviews: reviews[book.isbn] || []
+  }));
+  res.json(booksWithReviews);
 });
 
 // POST register
