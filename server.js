@@ -81,20 +81,34 @@ const authenticate = (req, res, next) => {
 };
 
 // POST review
-app.post('/review/:isbn', authenticate, (req, res) => {
-    const { rating, comment } = req.body;
-    const isbn = req.params.isbn;
-    if (!rating || !comment) return res.status(400).json({ message: 'Rating and comment required' });
-    if (!reviews[isbn]) reviews[isbn] = [];
-    const existing = reviews[isbn].findIndex(r => r.user === req.user.username);
-    const newReview = { user: req.user.username, rating, comment, date: new Date().toISOString() };
-    if (existing !== -1) {
-        reviews[isbn][existing] = newReview;
-        res.json({ message: 'Review updated successfully!', reviews: reviews[isbn] });
-    } else {
-        reviews[isbn].push(newReview);
-        res.json({ message: 'Review added successfully!', reviews: reviews[isbn] });
-    }
+// Đổi từ app.post thành app.put
+app.put('/review/:isbn', authenticate, (req, res) => {
+  const { rating, comment } = req.body;
+  const isbn = req.params.isbn;
+  
+  if (!rating || !comment) {
+    return res.status(400).json({ message: 'Rating and comment required' });
+  }
+  
+  if (!reviews[isbn]) {
+    reviews[isbn] = [];
+  }
+  
+  const existingIndex = reviews[isbn].findIndex(r => r.user === req.user.username);
+  const newReview = {
+    user: req.user.username,
+    rating,
+    comment,
+    date: new Date().toISOString()
+  };
+  
+  if (existingIndex !== -1) {
+    reviews[isbn][existingIndex] = newReview;
+    res.json({ message: 'Review updated successfully!', reviews: reviews[isbn] });
+  } else {
+    reviews[isbn].push(newReview);
+    res.json({ message: 'Review added successfully!', reviews: reviews[isbn] });
+  }
 });
 
 // DELETE review
